@@ -1,0 +1,7 @@
+node_modules/
+database.json
+logs.json
+downloads/*
+uploads/*
+!uploads/*.png
+.DS_Store

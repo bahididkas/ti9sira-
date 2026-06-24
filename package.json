@@ -1,0 +1,19 @@
+{
+  "name": "devsuite-hub",
+  "version": "1.0.0",
+  "description": "Software Tools Hub - Netlify Edition",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.0.0",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "author": "DevSuite Developer",
+  "license": "ISC"
+}

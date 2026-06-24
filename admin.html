@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | إدارة الأدوات البرمجية</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="main-header">
+    <div class="container nav-wrapper">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-cubes"></i>
+        </div>
+        <span class="logo-text">DevSuite Control</span>
+      </a>
+      
+      <div class="nav-controls">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="btn-glass theme-toggle-btn" title="تبديل المظهر">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <!-- Back to Store Button -->
+        <a href="index.html" class="btn-glass">
+          <i class="fa-solid fa-store"></i>
+          <span>العودة للمتجر</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- 1. GATEKEEPER AUTHENTICATION SCREEN -->
+    <div class="admin-lockscreen-wrapper" id="admin-auth-screen">
+      <div class="lockscreen-card">
+        <div class="lockscreen-icon">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h2 class="lockscreen-title">بوابة المشرف الأمنية</h2>
+        <p class="lockscreen-desc">يرجى كتابة رمز المرور الخاص بك للدخول إلى لوحة إدارة الأدوات البرمجية.</p>
+        
+        <form id="auth-form">
+          <div class="form-group">
+            <input type="password" id="auth-password" class="form-input text-center" placeholder="رمز المرور (الافتراضي: admin123)" required autofocus style="letter-spacing: 4px;">
+          </div>
+          <button type="submit" class="btn-glass btn-primary form-submit-btn" style="width: 100%;">
+            <i class="fa-solid fa-key"></i>
+            <span>تأكيد الدخول</span>
+          </button>
+        </form>
+        <p class="lockscreen-error" id="auth-error-msg">رمز المرور الذي أدخلته غير صحيح. يرجى المحاولة مجدداً.</p>
+      </div>
+    </div>
+
+    <!-- 2. MAIN ADMIN DASHBOARD LAYOUT (Hidden by default, shown on auth) -->
+    <div class="admin-layout" id="admin-dashboard-layout" style="display: none;">
+      
+      <!-- Sidebar Navigation -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-title">أقسام لوحة التحكم</div>
+        
+        <button class="admin-nav-item active" data-tab="tab-stats">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>إحصائيات عامة</span>
+        </button>
+        
+        <button class="admin-nav-item" data-tab="tab-add-tool" id="nav-add-tool-btn">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>إضافة أداة جديدة</span>
+        </button>
+        
+        <button class="admin-nav-item" data-tab="tab-manage-tools">
+          <i class="fa-solid fa-list-check"></i>
+          <span>إدارة الأدوات</span>
+        </button>
+        
+        <button class="admin-nav-item" data-tab="tab-backup">
+          <i class="fa-solid fa-database"></i>
+          <span>تصدير واستيراد</span>
+        </button>
+        
+        <div style="margin-top: auto; padding-top: 20px;">
+          <button class="admin-nav-item logout-btn" id="admin-logout-btn">
+            <i class="fa-solid fa-power-off"></i>
+            <span>تسجيل الخروج</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Dashboard Content -->
+      <div class="admin-main-content">
+        
+        <!-- TAB 1: GENERAL STATS PANEL -->
+        <section class="admin-panel-card active" id="tab-stats">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>إحصائيات وأداء المستودع</h2>
+              <p>نظرة عامة على حالة الأدوات البرمجية المنشورة وتفاعل المستخدمين.</p>
+            </div>
+            <i class="fa-solid fa-chart-line" style="font-size: 28px; color: var(--accent-primary);"></i>
+          </div>
+          
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">
+                <i class="fa-solid fa-cube"></i>
+              </div>
+              <div class="admin-stat-info">
+                <h4>إجمالي الأدوات</h4>
+                <span id="dashboard-total-tools">0</span>
+              </div>
+            </div>
+            
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">
+                <i class="fa-solid fa-download"></i>
+              </div>
+              <div class="admin-stat-info">
+                <h4>إجمالي التحميلات</h4>
+                <span id="dashboard-total-downloads">0</span>
+              </div>
+            </div>
+            
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div class="admin-stat-info">
+                <h4>حالة النظام</h4>
+                <span style="color: #10b981;">نشط ومؤمن</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recent Activity -->
+          <h3 class="mb-4" style="font-size: 18px; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">آخر النشاطات البرمجية</h3>
+          <div class="table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>النشاط</th>
+                  <th>التفاصيل</th>
+                  <th>التوقيت</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-activity-log">
+                <!-- Activity logs will be loaded dynamically -->
+                <tr>
+                  <td colspan="3" class="text-center" style="color: var(--text-secondary);">لا توجد نشاطات مسجلة حالياً.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 2: ADD / EDIT TOOL PANEL -->
+        <section class="admin-panel-card" id="tab-add-tool">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2 id="form-panel-title">نشر أداة برمجية جديدة</h2>
+              <p>املأ البيانات بدقة لتظهر الأداة بشكل رائع للزوار.</p>
+            </div>
+            <i class="fa-solid fa-pen-to-square" style="font-size: 28px; color: var(--accent-secondary);"></i>
+          </div>
+          
+          <form id="tool-form">
+            <input type="hidden" id="edit-tool-id" value="">
+            
+            <div class="form-grid">
+              <!-- Name -->
+              <div class="form-group">
+                <label class="form-label" for="tool-name">اسم الأداة البرمجية</label>
+                <input type="text" id="tool-name" class="form-input" placeholder="مثال: Auto Clicker Pro" required>
+              </div>
+              
+              <!-- Version -->
+              <div class="form-group">
+                <label class="form-label" for="tool-version">رقم الإصدار (Version)</label>
+                <input type="text" id="tool-version" class="form-input english-text" placeholder="v1.0.0" required style="text-align: right;">
+              </div>
+              
+              <!-- Category -->
+              <div class="form-group">
+                <label class="form-label" for="tool-category">تصنيف الأداة</label>
+                <select id="tool-category" class="form-input" required>
+                  <option value="" disabled selected>اختر تصنيف البرنامج...</option>
+                  <option value="أدوات نظام">أدوات نظام (System Tools)</option>
+                  <option value="أتمتة وإنتاجية">أتمتة وإنتاجية (Automation)</option>
+                  <option value="برمجة ومطورين">برمجة ومطورين (Developer Tools)</option>
+                  <option value="حماية وأمان">حماية وأمان (Security)</option>
+                  <option value="شبكات واتصال">شبكات واتصال (Network)</option>
+                </select>
+              </div>
+              
+              <!-- Icon Selector -->
+              <div class="form-group">
+                <label class="form-label" for="tool-icon">أيقونة البرنامج التعبيرية</label>
+                <select id="tool-icon" class="form-input" required>
+                  <option value="fa-rocket">صاروخ (للسرعة والتسريع)</option>
+                  <option value="fa-terminal">شاشة برمجية (للمطورين والأكواد)</option>
+                  <option value="fa-shield-halved">درع (للحماية والأمان)</option>
+                  <option value="fa-microchip">معالج (للنظام والقطع)</option>
+                  <option value="fa-arrows-to-dot">نقاط نقر (للأتمتة والنقرات)</option>
+                  <option value="fa-network-wired">شبكة (لأدوات الشبكات)</option>
+                  <option value="fa-gear">ترس (للإعدادات والصيانة)</option>
+                </select>
+              </div>
+              
+              <!-- File Upload (Auto Detects Size & Name) -->
+              <div class="form-group form-grid-full">
+                <label class="form-label" for="tool-file">اختر ملف البرنامج الفعلي (.exe, .zip, .rar)</label>
+                <input type="file" id="tool-file" class="form-input" accept=".exe,.zip,.rar,.7z">
+                <p id="edit-file-note" style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: none;">
+                  * اتركه فارغاً إذا كنت لا ترغب في استبدال الملف الفعلي المرفوع مسبقاً للأداة.
+                </p>
+              </div>
+              
+              <!-- Product Image Upload -->
+              <div class="form-group form-grid-full">
+                <label class="form-label" for="tool-image">صورة غلاف أو لقطة شاشة للبرنامج (.png, .jpg, .webp)</label>
+                <input type="file" id="tool-image" class="form-input" accept="image/*">
+                <div id="image-preview-container" style="margin-top: 12px; display: none; text-align: right;">
+                  <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">معاينة الصورة الحالية أو المحددة:</p>
+                  <img id="image-preview" src="" style="max-width: 220px; max-height: 125px; object-fit: cover; border-radius: 8px; border: 1px solid var(--panel-border);">
+                </div>
+              </div>
+
+
+              
+              <!-- Short Description -->
+              <div class="form-group form-grid-full">
+                <label class="form-label" for="tool-short-desc">وصف مختصر (يظهر في بطاقة المعرض الخارجية)</label>
+                <input type="text" id="tool-short-desc" class="form-input" placeholder="اكتب وصفاً جذاباً ومختصراً لا يتجاوز 120 حرفاً..." required maxlength="120">
+              </div>
+              
+              <!-- Long Description -->
+              <div class="form-group form-grid-full">
+                <label class="form-label" for="tool-long-desc">وصف تفصيلي كامل للأداة</label>
+                <textarea id="tool-long-desc" class="form-textarea" placeholder="اشرح بالتفصيل كيفية عمل البرنامج ومميزاته الكبرى..." required></textarea>
+              </div>
+              
+              <!-- Dynamic Features List -->
+              <div class="form-group form-grid-full">
+                <label class="form-label">الميزات الرئيسية للأداة (Features)</label>
+                <div class="dynamic-list-wrapper">
+                  <div class="dynamic-input-group">
+                    <input type="text" id="feature-input" class="form-input" placeholder="اكتب ميزة واضغط إضافة...">
+                    <button type="button" class="btn-glass btn-primary" id="add-feature-btn">
+                      <i class="fa-solid fa-plus"></i>
+                      <span>إضافة</span>
+                    </button>
+                  </div>
+                  <div class="dynamic-list-items" id="features-list-container">
+                    <!-- Features added dynamically will be shown here -->
+                  </div>
+                </div>
+              </div>
+              
+              <!-- System Requirements -->
+              <div class="form-group form-grid-full">
+                <label class="form-label" style="border-bottom: 1px solid var(--panel-border); padding-bottom: 8px; margin-bottom: 16px;">متطلبات تشغيل النظام (System Requirements)</label>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label" for="req-os">نظام التشغيل</label>
+                    <input type="text" id="req-os" class="form-input" placeholder="Windows 10/11" value="Windows 10/11 64-bit">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="req-ram">الذاكرة العشوائية (RAM)</label>
+                    <input type="text" id="req-ram" class="form-input" placeholder="4 GB RAM" value="4 GB RAM">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="req-cpu">المعالج (CPU)</label>
+                    <input type="text" id="req-cpu" class="form-input" placeholder="Intel i3" value="Intel i3 أو ما يعادله">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="req-disk">المساحة التخزينية</label>
+                    <input type="text" id="req-disk" class="form-input" placeholder="50 MB" value="50 MB مساحة خالية">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-actions-bar">
+              <button type="button" class="btn-glass" id="cancel-form-btn">إلغاء الأمر</button>
+              <button type="submit" class="btn-glass btn-primary" id="submit-form-btn">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>حفظ ونشر الأداة</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- TAB 3: MANAGE TOOLS PANEL -->
+        <section class="admin-panel-card" id="tab-manage-tools">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>إدارة وتعديل البرمجيات</h2>
+              <p>تعديل بيانات البرامج أو حذفها نهائياً من المستودع.</p>
+            </div>
+            <i class="fa-solid fa-folder-open" style="font-size: 28px; color: var(--accent-primary);"></i>
+          </div>
+          
+          <!-- Search in Management -->
+          <div class="search-box-wrapper mb-4">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="admin-search-input" class="search-input" placeholder="ابحث في الأدوات لإجراء تعديل أو حذف...">
+          </div>
+          
+          <div class="table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>اسم الأداة البرمجية</th>
+                  <th>التصنيف</th>
+                  <th>مرات التحميل</th>
+                  <th>الخيارات</th>
+                </tr>
+              </thead>
+              <tbody id="admin-tools-table-body">
+                <!-- Data will be loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 4: BACKUP & DATA PANEL -->
+        <section class="admin-panel-card" id="tab-backup">
+          <div class="admin-panel-header">
+            <div class="admin-panel-title">
+              <h2>النسخ الاحتياطي ونقل البيانات</h2>
+              <p>تصدير واستيراد بيانات أدواتك كملف JSON لسهولة مشاركتها أو حفظها.</p>
+            </div>
+            <i class="fa-solid fa-database" style="font-size: 28px; color: var(--accent-secondary);"></i>
+          </div>
+          
+          <div class="form-grid">
+            <!-- Export Card -->
+            <div class="stat-card" style="text-align: right; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+              <div>
+                <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--accent-primary);">تصدير البيانات (Backup Export)</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                  قم بتحميل ملف بيانات الأدوات الحالي (`tools.json`). يمكنك استخدام هذا الملف لتشغيل الموقع ثابتاً على أي استضافة دون الحاجة لذاكرة المتصفح.
+                </p>
+              </div>
+              <button class="btn-glass btn-primary" id="btn-export-json" style="width: 100%; margin-top: 20px; justify-content: center;">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <span>تحميل ملف البيانات JSON</span>
+              </button>
+            </div>
+            
+            <!-- Import Card -->
+            <div class="stat-card" style="text-align: right; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+              <div>
+                <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--accent-secondary);">استيراد البيانات (Import Data)</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                  قم برفع ملف بيانات الأدوات (`tools.json`) مسبق الصنع لشحنه في المتصفح دفعة واحدة. تنبيه: سيقوم هذا باستبدال الأدوات الحالية.
+                </p>
+              </div>
+              <div style="margin-top: 20px;">
+                <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                <button class="btn-glass" id="btn-trigger-import" style="width: 100%; justify-content: center;">
+                  <i class="fa-solid fa-file-arrow-up"></i>
+                  <span>اختيار ملف JSON واستيراده</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Reset Card (Danger Zone) -->
+            <div class="form-grid-full stat-card" style="text-align: right; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.02); min-height: auto;">
+              <h3 style="font-size: 18px; margin-bottom: 8px; color: #ef4444;">المنطقة الخطرة (Danger Zone)</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                إعادة ضبط قاعدة البيانات المحلية إلى حالتها الافتراضية. سيؤدي هذا الإجراء إلى حذف جميع الأدوات البرمجية التي قمت بإضافتها واستعادة الأدوات الـ 5 الافتراضية.
+              </p>
+              <button class="btn-glass" id="btn-reset-db" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444; justify-content: center;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>استعادة البيانات الافتراضية للـ 5 أدوات</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <div class="container footer-content">
+      <p>لوحة تحكم إدارة مستودع البرمجيات &copy; 2026 | أمان عالي وإدارة ذكية</p>
+    </div>
+  </footer>
+
+  <!-- Admin Panel Logic Scripts -->
+  <script src="admin.js"></script>
+</body>
+</html>
