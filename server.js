@@ -124,7 +124,7 @@ function logActivity(action, details) {
 // 0. Auth endpoints
 app.post('/api/auth/login', (req, res) => {
   const { password } = req.body || {};
-  if (password === 'admin123') {
+  if (password === 'BOUSBIA.2003.xd.B') {
     res.json({ success: true });
   } else {
     res.status(401).json({ error: 'كلمة المرور غير صحيحة' });
